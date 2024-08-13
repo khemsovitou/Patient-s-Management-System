@@ -44,11 +44,8 @@ void addPatient() {
     printf("Enter patient age: ");
     scanf("%d", &newPatient.age);
     getchar(); 
-    printf("Enter patient diagnosis: ");
-    fgets(newPatient.diagnosis, sizeof(newPatient.diagnosis), stdin);
-    newPatient.diagnosis[strcspn(newPatient.diagnosis, "\n")] = '\0'; 
     newPatient.medicineCount = 0;
-    printf("Enter patient's allergy : ");
+    printf("Enter patient's allergy: ");
     fgets(newPatient.history, sizeof(newPatient.history), stdin);
     newPatient.history[strcspn(newPatient.history, "\n")] = '\0';
     patients[patientCount++] = newPatient;
@@ -56,6 +53,10 @@ void addPatient() {
 }
 
 void addMedicine(int patientIndex) {
+    printf("Enter patient diagnosis: ");
+    fgets(patients[patientIndex].diagnosis, sizeof(patients[patientIndex].diagnosis), stdin);
+    patients[patientIndex].diagnosis[strcspn(patients[patientIndex].diagnosis, "\n")] = '\0';
+
     if (patients[patientIndex].medicineCount >= MAX_MEDICINES) {
         printf("Maximum medicine limit reached for this patient.\n");
         return;
@@ -91,7 +92,6 @@ void addMedicine(int patientIndex) {
     patients[patientIndex].medicines[patients[patientIndex].medicineCount++] = newMedicine;
     printf("Medicine added successfully.\n");
 }
-
 
 void viewPatientInfo(int patientIndex) {
     printf("ID: %d\n", patients[patientIndex].id);
@@ -202,6 +202,7 @@ void searchPatient() {
         printf("No matching patient found.\n");
     }
 }
+
 void reportCommonDiagnoses() {
     char diagnosis[100];
     printf("Enter diagnosis to report: ");
@@ -216,7 +217,6 @@ void reportCommonDiagnoses() {
     }
     printf("Number of patients with '%s': %d\n", diagnosis, count);
 }
-
 
 void menu() {
     int choice;
@@ -236,42 +236,45 @@ void menu() {
             case 1:
                 addPatient();
                 break;
-            case 2: 
-            {
-                int id;
-                printf("Enter patient ID to add medicine: ");
-                scanf("%d", &id);
-                getchar();
+            case 2: {
+                int patientId;
+                printf("Enter the patient ID to add medicine: ");
+                scanf("%d", &patientId);
+                getchar(); 
 
-                int found = 0;
+                int patientIndex = -1;
                 for (int i = 0; i < patientCount; i++) {
-                    if (patients[i].id == id) {
-                        addMedicine(i);
-                        found = 1;
+                    if (patients[i].id == patientId) {
+                        patientIndex = i;
                         break;
                     }
                 }
-                if (!found) {
+
+                if (patientIndex == -1) {
                     printf("Patient not found.\n");
+                } else {
+                    addMedicine(patientIndex);
                 }
                 break;
             }
             case 3: {
-                int id;
-                printf("Enter your patient ID to view info: ");
-                scanf("%d", &id);
+                int patientId;
+                printf("Enter the patient ID to view info: ");
+                scanf("%d", &patientId);
                 getchar();
 
-                int found = 0;
+                int patientIndex = -1;
                 for (int i = 0; i < patientCount; i++) {
-                    if (patients[i].id == id) {
-                        viewPatientInfo(i);
-                        found = 1;
+                    if (patients[i].id == patientId) {
+                        patientIndex = i;
                         break;
                     }
                 }
-                if (!found) {
+
+                if (patientIndex == -1) {
                     printf("Patient not found.\n");
+                } else {
+                    viewPatientInfo(patientIndex);
                 }
                 break;
             }
@@ -285,10 +288,10 @@ void menu() {
                 reportCommonDiagnoses();
                 break;
             case 7:
-                printf("Exiting the system.\n");
+                printf("Exiting system.\n");
                 break;
             default:
-                printf("Invalid choice. Please try again.\n");
+                printf("Invalid choice. Try again.\n");
         }
     } while (choice != 7);
 }
